@@ -1,0 +1,20 @@
+[
+    {
+        "url": "http://example.com/page1",
+        "title": "测试页面1",
+        "anchor_texts": "测试锚文本1",
+        "content": "这是页面1的内容",
+        "outlinks": ["http://example.com/link1"],
+        "raw_html": "<html><body>页面1</body></html>",
+        "attachments": ["doc1.pdf"]
+    },
+    {
+        "url": "http://example.com/page2",
+        "title": "测试页面2",
+        "anchor_texts": "测试锚文本2",
+        "content": "这是页面2的内容",
+        "outlinks": ["http://example.com/link2"],
+        "raw_html": "<html><body>页面2</body></html>",
+        "attachments": ["doc2.docx"]
+    }
+]

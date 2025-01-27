@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>查询历史记录</title>
+</head>
+
+<body>
+    <h1>查询历史记录</h1>
+    <ul>
+        {% for item in history %}
+        <li>{{ item.timestamp }}: {{ item.query }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/">返回</a>
+</body>
+
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>搜索结果</title>
+</head>
+
+<body>
+    <h1>搜索词：{{ query }}</h1>
+    <p> </p>
+    <ul>
+        {% for r in results %}
+        <li>
+            <a href="{{ r.url }}" target="_blank">{{ r.title }}</a><br>
+            <small>Score: {{ r.score }}, PageRank: {{ r.pagerank }}</small><br>
+            <p>{{ r.snippet }}</p>
+            <!-- 添加网页快照链接 -->
+            <a href="/snapshot?url={{ r.url }}" target="_blank">网页快照</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- 分页导航 -->
+    <div>
+        {% if page > 1 %}
+        <a href="?q={{ query }}&page={{ page - 1 }}">上一页</a>
+        {% endif %}
+        {% if results|length == page_size %}
+        <a href="?q={{ query }}&page={{ page + 1 }}">下一页</a>
+        {% endif %}
+    </div>
+
+    <a href="/">返回搜索页</a>
+</body>
+
+</html>

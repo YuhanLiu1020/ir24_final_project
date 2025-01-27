@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>站内搜索</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+
+        form {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"],
+        select,
+        button {
+            padding: 10px;
+            margin: 5px;
+        }
+
+        input[type="text"] {
+            width: 300px;
+        }
+
+        select {
+            width: 200px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: 2px solid #0056b3;
+            cursor: pointer;
+            width: 100px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #recent-searches {
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: none;
+            width: 300px;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            text-align: left;
+        }
+
+        #recent-searches ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #recent-searches li {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #recent-searches li:hover {
+            background-color: #f1f1f1;
+        }
+
+        h1 {
+            color: #5D3FD3;
+        }
+
+        img {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="{{ url_for('static', filename='images/title.png') }}" alt="Nankai University">
+    <h1>站内搜索</h1>
+
+    {% if message %}
+    <p style="color: red;">{{ message }}</p>
+    {% endif %}
+
+    <!-- 用户状态显示 -->
+    {% if logged_in %}
+    <p>当前用户：{{ user_id }} |
+        <a href="/logout">登出</a> |
+        <a href="/history">历史记录</a> |
+        <a href="/user_home">用户主页</a>
+    </p>
+    {% else %}
+    <p><a href="/login">登录</a> | <a href="/register">注册</a></p>
+    {% endif %}
+
+    <!-- 搜索表单 -->
+    <form action="/search" method="post">
+        <input type="text" name="q" id="search-box" placeholder="输入查询词..." autocomplete="off" required>
+        <select id="type" name="type">
+            <option value="standard">标准查询</option>
+            <option value="phrase">短语查询</option>
+            <option value="document">文档查询</option>
+            <option value="wildcard">通配符查询</option>
+        </select>
+        <button type="submit">搜索</button>
+    </form>
+
+    <!-- 历史搜索及联想推荐结果 -->
+    <div id="recent-searches">
+        <ul id="search-history"></ul>
+    </div>
+
+    <script>
+        const searchBox = document.getElementById('search-box');
+        const recentSearchesDiv = document.getElementById('recent-searches');
+        const historyUl = document.getElementById('search-history');
+
+        // 显示历史搜索
+        searchBox.addEventListener('focus', showRecentSearches);
+
+        function showRecentSearches() {
+            fetch('/get_recent_searches')
+                .then(response => response.json())
+                .then(data => {
+                    historyUl.innerHTML = ''; // 清空之前的记录
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item.query;
+                        li.addEventListener('click', () => {
+                            searchBox.value = item.query;
+                            recentSearchesDiv.style.display = 'none';
+                        });
+                        historyUl.appendChild(li);
+                    });
+                    recentSearchesDiv.style.display = 'block'; // 显示历史记录
+                })
+                .catch(error => console.error('Error fetching recent searches:', error));
+        }
+
+        // 实时联想推荐
+        searchBox.addEventListener('input', function () {
+            const query = searchBox.value.trim();
+            if (query === '') {
+                recentSearchesDiv.style.display = 'none';
+                return;
+            }
+
+            fetch(`/autocomplete?q=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    historyUl.innerHTML = ''; // 清空之前的记录
+                    data.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item; // 显示推荐内容
+                        li.addEventListener('click', () => {
+                            searchBox.value = item; // 点击推荐填充输入框
+                            recentSearchesDiv.style.display = 'none';
+                        });
+                        historyUl.appendChild(li);
+                    });
+                    recentSearchesDiv.style.display = data.length > 0 ? 'block' : 'none';
+                })
+                .catch(error => console.error('Error fetching autocomplete data:', error));
+        });
+
+        // 点击页面其他地方时隐藏推荐框
+        document.addEventListener('click', function (e) {
+            if (e.target !== searchBox && e.target !== recentSearchesDiv) {
+                recentSearchesDiv.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

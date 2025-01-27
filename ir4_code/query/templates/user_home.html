@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>用户主页</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+            /* Center aligns all content */
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        h1,
+        h2 {
+            margin-bottom: 10px;
+            color: #5D3FD3;
+            /* Dark purple for headings */
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>用户主页</h1>
+    <p>当前用户ID：{{ user_id }}</p>
+    <p><a href="/logout">登出</a> | <a href="/history">我的搜索历史</a> | <a href="/">返回搜索首页</a></p>
+
+    <div class="section">
+        <h2>今日推荐</h2>
+        {% if today_recommendations and today_recommendations|length > 0 %}
+        <ul>
+            {% for rec in today_recommendations %}
+            <li><a href="{{ rec.url }}" target="_blank">{{ rec.title }}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>暂无推荐</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>根据你的历史记录推荐</h2>
+        {% if history_recommendations and history_recommendations|length > 0 %}
+        <ul>
+            {% for rec in history_recommendations %}
+            <li><a href="{{ rec.url }}" target="_blank">{{ rec.title }}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>暂无推荐</p>
+        {% endif %}
+    </div>
+</body>
+
+</html>
